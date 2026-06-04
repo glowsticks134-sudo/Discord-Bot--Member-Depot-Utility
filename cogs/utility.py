@@ -124,6 +124,11 @@ class Utility(commands.Cog):
             value="`/faq` — sends an interactive FAQ dropdown",
             inline=False
         )
+        embed.add_field(
+            name="📋 Info & Setup",
+            value="`/setchannel` `/channelinfo` `/sendhowto` `/sendtos`",
+            inline=False
+        )
 
         embed.set_thumbnail(url=self.bot.user.display_avatar.url)
         embed.set_footer(text=config.FOOTER_TEXT)
