@@ -3,7 +3,10 @@ import discord
 from discord.ext import commands
 import os
 import datetime
+from dotenv import load_dotenv
 import config
+
+load_dotenv()
 
 intents = discord.Intents.all()
 
