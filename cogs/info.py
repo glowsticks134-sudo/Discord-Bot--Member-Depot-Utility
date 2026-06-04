@@ -10,31 +10,30 @@ import config
 CHANNELS_FILE = "data/channels.json"
 
 
-def load_channels() -> dict:
+def load_data() -> dict:
     if os.path.exists(CHANNELS_FILE):
         with open(CHANNELS_FILE, "r") as f:
             return json.load(f)
     return {}
 
 
-def save_channels(data: dict):
+def save_data(data: dict):
     os.makedirs("data", exist_ok=True)
     with open(CHANNELS_FILE, "w") as f:
         json.dump(data, f, indent=2)
 
 
-def get_guild_channels(guild_id: int) -> dict:
-    data = load_channels()
-    return data.get(str(guild_id), {})
+def get_guild_data(guild_id: int) -> dict:
+    return load_data().get(str(guild_id), {})
 
 
-def set_guild_channel(guild_id: int, key: str, channel_id: int):
-    data = load_channels()
+def set_guild_value(guild_id: int, key: str, value):
+    data = load_data()
     gid = str(guild_id)
     if gid not in data:
         data[gid] = {}
-    data[gid][key] = channel_id
-    save_channels(data)
+    data[gid][key] = value
+    save_data(data)
 
 
 def info_embed(title, description=None, color=None):
@@ -64,45 +63,65 @@ class Info(commands.Cog):
     ])
     @app_commands.default_permissions(administrator=True)
     async def setchannel(self, interaction: discord.Interaction, channel_type: app_commands.Choice[str], channel: discord.TextChannel):
-        set_guild_channel(interaction.guild.id, channel_type.value, channel.id)
-
-        labels = {
-            "add_bot": "add-bot",
-            "farm_here": "farm-here",
-            "plans": "plans"
-        }
-
-        embed = info_embed(
+        set_guild_value(interaction.guild.id, channel_type.value, channel.id)
+        labels = {"add_bot": "add-bot", "farm_here": "farm-here", "plans": "plans"}
+        await interaction.response.send_message(embed=info_embed(
             "✅ Channel Set",
-            f"The **{labels[channel_type.value]}** channel has been set to {channel.mention}.\n\n"
-            f"This will be used in `/sendhowto` embeds.",
+            f"The **{labels[channel_type.value]}** channel has been set to {channel.mention}.",
             config.COLOR_SUCCESS
-        )
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+        ), ephemeral=True)
 
-    @app_commands.command(name="channelinfo", description="View the currently set channels for this server")
+    @app_commands.command(name="setlink", description="Set a button link used in /sendplans")
+    @app_commands.describe(
+        link_type="Which link to set",
+        url="The full URL (must start with https://)"
+    )
+    @app_commands.choices(link_type=[
+        app_commands.Choice(name="Upgrade Now", value="upgrade_now_url"),
+        app_commands.Choice(name="Payment Methods", value="payment_methods_url"),
+    ])
+    @app_commands.default_permissions(administrator=True)
+    async def setlink(self, interaction: discord.Interaction, link_type: app_commands.Choice[str], url: str):
+        if not url.startswith("https://") and not url.startswith("http://"):
+            await interaction.response.send_message(embed=info_embed(
+                "❌ Invalid URL", "URL must start with `https://`.", config.COLOR_ERROR
+            ), ephemeral=True)
+            return
+        set_guild_value(interaction.guild.id, link_type.value, url)
+        await interaction.response.send_message(embed=info_embed(
+            "✅ Link Set",
+            f"**{link_type.name}** button URL has been saved.",
+            config.COLOR_SUCCESS
+        ), ephemeral=True)
+
+    @app_commands.command(name="channelinfo", description="View the currently set channels and links for this server")
     @app_commands.default_permissions(administrator=True)
     async def channelinfo(self, interaction: discord.Interaction):
-        channels = get_guild_channels(interaction.guild.id)
+        d = get_guild_data(interaction.guild.id)
 
-        def fmt(key):
-            cid = channels.get(key)
+        def fmt_ch(key):
+            cid = d.get(key)
             return f"<#{cid}>" if cid else "❌ Not set"
 
-        embed = info_embed("📋 Channel Settings", color=config.COLOR_PRIMARY)
-        embed.add_field(name="add-bot", value=fmt("add_bot"), inline=True)
-        embed.add_field(name="farm-here", value=fmt("farm_here"), inline=True)
-        embed.add_field(name="plans", value=fmt("plans"), inline=True)
+        def fmt_url(key):
+            url = d.get(key)
+            return f"[Link]({url})" if url else "❌ Not set"
+
+        embed = info_embed("📋 Server Settings", color=config.COLOR_PRIMARY)
+        embed.add_field(name="add-bot channel", value=fmt_ch("add_bot"), inline=True)
+        embed.add_field(name="farm-here channel", value=fmt_ch("farm_here"), inline=True)
+        embed.add_field(name="plans channel", value=fmt_ch("plans"), inline=True)
+        embed.add_field(name="Upgrade Now URL", value=fmt_url("upgrade_now_url"), inline=True)
+        embed.add_field(name="Payment Methods URL", value=fmt_url("payment_methods_url"), inline=True)
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
     @app_commands.command(name="sendhowto", description="Send the 'How To Use Member Depot' embed")
     @app_commands.default_permissions(manage_messages=True)
     async def sendhowto(self, interaction: discord.Interaction):
-        channels = get_guild_channels(interaction.guild.id)
-
-        add_bot = f"<#{channels['add_bot']}>" if channels.get("add_bot") else "**#add-bot**"
-        farm_here = f"<#{channels['farm_here']}>" if channels.get("farm_here") else "**#farm-here**"
-        plans = f"<#{channels['plans']}>" if channels.get("plans") else "**#plans**"
+        d = get_guild_data(interaction.guild.id)
+        add_bot = f"<#{d['add_bot']}>" if d.get("add_bot") else "**#add-bot**"
+        farm_here = f"<#{d['farm_here']}>" if d.get("farm_here") else "**#farm-here**"
+        plans = f"<#{d['plans']}>" if d.get("plans") else "**#plans**"
 
         embed = discord.Embed(
             title="How To Use Member Depot",
@@ -166,6 +185,79 @@ class Info(commands.Cog):
         )
         embed.set_footer(text=config.FOOTER_TEXT)
         await interaction.response.send_message(embed=embed)
+
+    @app_commands.command(name="sendplans", description="Send the Member Depot Plans embed")
+    @app_commands.default_permissions(manage_messages=True)
+    async def sendplans(self, interaction: discord.Interaction):
+        d = get_guild_data(interaction.guild.id)
+        upgrade_url = d.get("upgrade_now_url")
+        payment_url = d.get("payment_methods_url")
+
+        embed = discord.Embed(
+            title="__Plans__",
+            description=(
+                "Hello and Welcome to our **__PLANS__**! "
+                "Here we've got some amazing and suitable offers and tools which will help you grow your server the QUICKEST! "
+                "Please read below for more information."
+            ),
+            color=config.COLOR_PRIMARY,
+            timestamp=datetime.datetime.utcnow()
+        )
+
+        embed.add_field(
+            name="__PRICES__",
+            value=(
+                "• @Members — Free\n"
+                "• @Bronze — $2 USD\n"
+                "• @Silver — $4 USD\n"
+                "• @Gold — $6 USD\n"
+                "• @Premium — $10 USD\n"
+                "• @Diamond — $15 USD"
+            ),
+            inline=False
+        )
+
+        embed.add_field(
+            name="__STATS__",
+            value=(
+                "• @Members — 2 Members\n"
+                "• @Bronze — 5 Members\n"
+                "• @Silver — 10 Members\n"
+                "• @Gold — 15 Members\n"
+                "• @Premium — 25 Members\n"
+                "• @Diamond — 35 Members"
+            ),
+            inline=False
+        )
+
+        embed.set_footer(text=config.FOOTER_TEXT)
+
+        view = discord.ui.View()
+        if upgrade_url:
+            view.add_item(discord.ui.Button(label="💰 Upgrade Now", url=upgrade_url, style=discord.ButtonStyle.link))
+        if payment_url:
+            view.add_item(discord.ui.Button(label="💵 Payment Methods", url=payment_url, style=discord.ButtonStyle.link))
+
+        if not upgrade_url and not payment_url:
+            await interaction.response.send_message(embed=embed)
+        else:
+            await interaction.response.send_message(embed=embed, view=view)
+
+        if not upgrade_url or not payment_url:
+            missing = []
+            if not upgrade_url:
+                missing.append("`Upgrade Now`")
+            if not payment_url:
+                missing.append("`Payment Methods`")
+            await interaction.followup.send(
+                embed=info_embed(
+                    "⚠️ Missing Button Links",
+                    f"The following button(s) have no URL set yet: {', '.join(missing)}.\n"
+                    f"Use `/setlink` to add them.",
+                    config.COLOR_WARNING
+                ),
+                ephemeral=True
+            )
 
 
 async def setup(bot):
