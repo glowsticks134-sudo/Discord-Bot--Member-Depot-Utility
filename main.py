@@ -82,7 +82,7 @@ async def on_command_error(ctx, error):
 
 
 async def load_cogs():
-    for cog in ["moderation", "antinuke", "utility"]:
+    for cog in ["moderation", "antinuke", "utility", "faq"]:
         try:
             await bot.load_extension(f"cogs.{cog}")
             print(f"   Loaded cog: {cog}")

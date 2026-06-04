@@ -116,7 +116,12 @@ class Utility(commands.Cog):
         )
         embed.add_field(
             name="🔧 Utility",
-            value="`/ping` `/serverinfo` `/userinfo` `/avatar` `/botinfo` `/help`",
+            value="`/ping` `/serverinfo` `/userinfo` `/avatar` `/botinfo` `/help` `/embed`",
+            inline=False
+        )
+        embed.add_field(
+            name="❓ FAQ",
+            value="`/faq` — sends an interactive FAQ dropdown",
             inline=False
         )
 
