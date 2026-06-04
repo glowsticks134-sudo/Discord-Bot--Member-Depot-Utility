@@ -126,7 +126,7 @@ class Utility(commands.Cog):
         )
         embed.add_field(
             name="📋 Info & Setup",
-            value="`/setchannel` `/channelinfo` `/sendhowto` `/sendtos`",
+            value="`/setchannel` `/channelinfo` `/sendhowto` `/sendtos` `/sendrules`",
             inline=False
         )
 

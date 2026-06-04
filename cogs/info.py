@@ -139,6 +139,34 @@ class Info(commands.Cog):
         embed.set_footer(text=config.FOOTER_TEXT)
         await interaction.response.send_message(embed=embed)
 
+    @app_commands.command(name="sendrules", description="Send the Member Depot Rules embed")
+    @app_commands.default_permissions(manage_messages=True)
+    async def sendrules(self, interaction: discord.Interaction):
+        embed = discord.Embed(
+            title="Member Depot Rules",
+            description=(
+                "1.  **Asking others to do !djoin for your server is not allowed and will result in a blacklist.**\n"
+                "2.  **DM advertising is not allowed and will lead to a ban.**\n"
+                "3.  **Using alternate accounts is not allowed and will result in a ban.**\n"
+                "4.  **Doxing or sharing personal information is not allowed and will result in a ban.**\n"
+                "5.  **Spamming is not allowed and will result in a mute.**\n"
+                "6.  **Pinging staff without a valid reason is not allowed and will lead to a mute.**\n"
+                "7.  **This is an English-only server, so please communicate in English.**\n"
+                "8.  **Creating tickets for unnecessary reasons/issues is not allowed and will result in a mute.**\n"
+                "9.  **Asking about restocks is bothersome and not allowed, and may result in a mute.**\n"
+                "10.  **Opening a ticket and saying nothing within 15 minutes will result in ticket deletion and a mute.**\n"
+                "11.  **Please do not spam @ staff members or the owner.**\n"
+                "12.  **We do not allow 'J4J Servers' to get invites. Doing so will result in a complete reset of your invites.**\n"
+                "13.  **Reselling members is not allowed and will result in a blacklist and a ban.**\n"
+                "14.  **DMing staff for unnecessary reasons is not allowed and will result in a mute.**\n"
+                "15.  **Scamming is highly discouraged and will not be tolerated, resulting in a ban.**"
+            ),
+            color=config.COLOR_PRIMARY,
+            timestamp=datetime.datetime.utcnow()
+        )
+        embed.set_footer(text=config.FOOTER_TEXT)
+        await interaction.response.send_message(embed=embed)
+
 
 async def setup(bot):
     await bot.add_cog(Info(bot))
