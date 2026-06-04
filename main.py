@@ -3,6 +3,8 @@ import discord
 from discord.ext import commands
 import os
 import datetime
+import asyncio
+from aiohttp import web
 from dotenv import load_dotenv
 import config
 
@@ -104,5 +106,21 @@ async def main():
         await bot.start(token)
 
 
-import asyncio
-asyncio.run(main())
+async def keepalive():
+    async def handle(request):
+        return web.Response(text="Member Depot Bot is running!")
+    app = web.Application()
+    app.router.add_get("/", handle)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    port = int(os.environ.get("PORT", 8080))
+    site = web.TCPSite(runner, "0.0.0.0", port)
+    await site.start()
+    print(f"   Keepalive server running on port {port}")
+
+
+async def run():
+    await asyncio.gather(keepalive(), main())
+
+
+asyncio.run(run())
