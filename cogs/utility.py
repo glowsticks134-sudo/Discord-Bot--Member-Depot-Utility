@@ -129,6 +129,11 @@ class Utility(commands.Cog):
             value="`/setchannel` `/setlink` `/channelinfo` `/sendhowto` `/sendtos` `/sendrules` `/sendplans`",
             inline=False
         )
+        embed.add_field(
+            name="🥉 Free Bronze",
+            value="`/setbronze` `/freebronze`",
+            inline=False
+        )
 
         embed.set_thumbnail(url=self.bot.user.display_avatar.url)
         embed.set_footer(text=config.FOOTER_TEXT)

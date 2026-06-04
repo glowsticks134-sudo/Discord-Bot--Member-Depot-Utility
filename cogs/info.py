@@ -71,7 +71,7 @@ class Info(commands.Cog):
             config.COLOR_SUCCESS
         ), ephemeral=True)
 
-    @app_commands.command(name="setlink", description="Set a button link used in /sendplans")
+    @app_commands.command(name="setlink", description="Set a link used by the bot in embeds and buttons")
     @app_commands.describe(
         link_type="Which link to set",
         url="The full URL (must start with https://)"
@@ -79,6 +79,7 @@ class Info(commands.Cog):
     @app_commands.choices(link_type=[
         app_commands.Choice(name="Upgrade Now", value="upgrade_now_url"),
         app_commands.Choice(name="Payment Methods", value="payment_methods_url"),
+        app_commands.Choice(name="Server Link", value="server_link"),
     ])
     @app_commands.default_permissions(administrator=True)
     async def setlink(self, interaction: discord.Interaction, link_type: app_commands.Choice[str], url: str):
