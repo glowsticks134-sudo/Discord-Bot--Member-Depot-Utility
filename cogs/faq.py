@@ -12,11 +12,11 @@ FAQ_ITEMS = [
         "emoji": "❓",
         "answer_title": "I am not getting any members",
         "answer": (
-            "> Quick tip: Please do **!checkqueue (Server ID)** in <#1508856981643984957> and if you're in the queue then that's why. "
+            f"> Quick tip: Please do **!checkqueue (Server ID)** in <#{config.CHANNEL_FARM_HERE}> and if you're in the queue then that's why. "
             "If you're not in the queue then proceed to read the next steps. The reason for this issue is because there is **no stock** left. "
             "However, we highly advise you to do the command again just to be sure. If you still get **no joins** it's because the bot is **out of stock.**\n\n"
-            "> However, there are some solutions to get an accurate answer to why. Please head to <#1508856981643984957> and do **!checkserver (ServerID)** "
-            "and it should tell you what you need to know. We also advise you to check <#1508856975142944768>."
+            f"> However, there are some solutions to get an accurate answer to why. Please head to <#{config.CHANNEL_FARM_HERE}> and do **!checkserver (ServerID)** "
+            f"and it should tell you what you need to know. We also advise you to check <#{config.CHANNEL_STOCK}>."
         )
     },
     {

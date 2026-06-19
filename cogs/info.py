@@ -208,12 +208,12 @@ class Info(commands.Cog):
         embed.add_field(
             name="__PRICES__",
             value=(
-                "• @Members — Free\n"
-                "• @Bronze — $2 USD\n"
-                "• @Silver — $4 USD\n"
-                "• @Gold — $6 USD\n"
-                "• @Premium — $10 USD\n"
-                "• @Diamond — $15 USD"
+                f"• <@&{config.ROLE_FREE_BRONZE}> — Free\n"
+                f"• <@&{config.ROLE_BRONZE}> — $2 USD\n"
+                f"• <@&{config.ROLE_SILVER}> — $4 USD\n"
+                f"• <@&{config.ROLE_GOLD}> — $6 USD\n"
+                f"• <@&{config.ROLE_PREMIUM}> — $10 USD\n"
+                f"• <@&{config.ROLE_DIAMOND}> — $15 USD"
             ),
             inline=False
         )
@@ -221,12 +221,12 @@ class Info(commands.Cog):
         embed.add_field(
             name="__STATS__",
             value=(
-                "• @Members — 2 Members\n"
-                "• @Bronze — 5 Members\n"
-                "• @Silver — 10 Members\n"
-                "• @Gold — 15 Members\n"
-                "• @Premium — 25 Members\n"
-                "• @Diamond — 35 Members"
+                f"• <@&{config.ROLE_FREE_BRONZE}> — 2 Members\n"
+                f"• <@&{config.ROLE_BRONZE}> — 5 Members\n"
+                f"• <@&{config.ROLE_SILVER}> — 10 Members\n"
+                f"• <@&{config.ROLE_GOLD}> — 15 Members\n"
+                f"• <@&{config.ROLE_PREMIUM}> — 25 Members\n"
+                f"• <@&{config.ROLE_DIAMOND}> — 35 Members"
             ),
             inline=False
         )
