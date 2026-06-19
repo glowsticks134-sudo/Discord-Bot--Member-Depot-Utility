@@ -139,6 +139,17 @@ class Utility(commands.Cog):
         embed.set_footer(text=config.FOOTER_TEXT)
         await interaction.response.send_message(embed=embed)
 
+    @app_commands.command(name="say", description="Make the bot send a message in a channel")
+    @app_commands.describe(message="The message to send", channel="Channel to send it to (defaults to current channel)")
+    @app_commands.default_permissions(manage_messages=True)
+    async def say(self, interaction: discord.Interaction, message: str, channel: discord.TextChannel = None):
+        target = channel or interaction.channel
+        await target.send(message)
+        await interaction.response.send_message(
+            embed=util_embed(f"✅ Message sent to {target.mention}.", color=config.COLOR_SUCCESS),
+            ephemeral=True
+        )
+
     @app_commands.command(name="embed", description="Open the embed builder (Admin only)")
     @app_commands.describe(channel="Channel to send the embed to (defaults to current channel)")
     @app_commands.default_permissions(administrator=True)
