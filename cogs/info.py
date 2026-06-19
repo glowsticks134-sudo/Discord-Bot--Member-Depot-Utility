@@ -208,7 +208,8 @@ class Info(commands.Cog):
         embed.add_field(
             name="__PRICES__",
             value=(
-                f"• <@&{config.ROLE_FREE_BRONZE}> — Free\n"
+                f"• <@&{config.ROLE_MEMBER}> — Free\n"
+                f"• <@&{config.ROLE_FREE_BRONZE}> — Free (status promotion)\n"
                 f"• <@&{config.ROLE_BRONZE}> — $2 USD\n"
                 f"• <@&{config.ROLE_SILVER}> — $4 USD\n"
                 f"• <@&{config.ROLE_GOLD}> — $6 USD\n"
@@ -221,7 +222,8 @@ class Info(commands.Cog):
         embed.add_field(
             name="__STATS__",
             value=(
-                f"• <@&{config.ROLE_FREE_BRONZE}> — 2 Members\n"
+                f"• <@&{config.ROLE_MEMBER}> — 2 Members\n"
+                f"• <@&{config.ROLE_FREE_BRONZE}> — 5 Members\n"
                 f"• <@&{config.ROLE_BRONZE}> — 5 Members\n"
                 f"• <@&{config.ROLE_SILVER}> — 10 Members\n"
                 f"• <@&{config.ROLE_GOLD}> — 15 Members\n"
