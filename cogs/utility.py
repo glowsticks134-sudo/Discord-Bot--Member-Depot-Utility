@@ -139,17 +139,88 @@ class Utility(commands.Cog):
         embed.set_footer(text=config.FOOTER_TEXT)
         await interaction.response.send_message(embed=embed)
 
-    @app_commands.command(name="embed", description="Send a custom embed (Admin only)")
-    @app_commands.describe(title="Embed title", description="Embed description", color="Hex color (e.g. 5865F2)")
+    @app_commands.command(name="embed", description="Open the embed builder (Admin only)")
+    @app_commands.describe(channel="Channel to send the embed to (defaults to current channel)")
     @app_commands.default_permissions(administrator=True)
-    async def embed_cmd(self, interaction: discord.Interaction, title: str, description: str, color: str = None):
+    async def embed_cmd(self, interaction: discord.Interaction, channel: discord.TextChannel = None):
+        target = channel or interaction.channel
+        await interaction.response.send_modal(EmbedBuilderModal(target))
+
+
+class EmbedBuilderModal(discord.ui.Modal, title="Embed Builder"):
+    embed_title = discord.ui.TextInput(
+        label="Title",
+        placeholder="Enter the embed title...",
+        max_length=256,
+        required=True,
+    )
+    embed_description = discord.ui.TextInput(
+        label="Description",
+        placeholder="Enter the embed description...",
+        style=discord.TextStyle.paragraph,
+        max_length=4000,
+        required=True,
+    )
+    embed_color = discord.ui.TextInput(
+        label="Color (hex, e.g. 5865F2)",
+        placeholder="5865F2",
+        max_length=7,
+        required=False,
+    )
+    embed_image = discord.ui.TextInput(
+        label="Image URL (optional)",
+        placeholder="https://...",
+        required=False,
+    )
+    embed_thumbnail = discord.ui.TextInput(
+        label="Thumbnail URL (optional)",
+        placeholder="https://...",
+        required=False,
+    )
+
+    def __init__(self, channel: discord.TextChannel):
+        super().__init__()
+        self.target_channel = channel
+
+    async def on_submit(self, interaction: discord.Interaction):
         try:
-            hex_color = int(color.lstrip("#"), 16) if color else config.COLOR_PRIMARY
+            hex_color = int(self.embed_color.value.lstrip("#"), 16) if self.embed_color.value.strip() else config.COLOR_PRIMARY
         except Exception:
             hex_color = config.COLOR_PRIMARY
-        embed = discord.Embed(title=title, description=description, color=hex_color, timestamp=datetime.datetime.utcnow())
+
+        embed = discord.Embed(
+            title=self.embed_title.value,
+            description=self.embed_description.value,
+            color=hex_color,
+            timestamp=datetime.datetime.utcnow()
+        )
+
+        if self.embed_thumbnail.value.strip():
+            embed.set_thumbnail(url=self.embed_thumbnail.value.strip())
+
+        if self.embed_image.value.strip():
+            embed.set_image(url=self.embed_image.value.strip())
+
         embed.set_footer(text=config.FOOTER_TEXT)
-        await interaction.response.send_message(embed=embed)
+
+        await self.target_channel.send(embed=embed)
+
+        confirm = discord.Embed(
+            description=f"✅ Embed sent to {self.target_channel.mention}.",
+            color=config.COLOR_SUCCESS
+        )
+        confirm.set_footer(text=config.FOOTER_TEXT)
+        await interaction.response.send_message(embed=confirm, ephemeral=True)
+
+    async def on_error(self, interaction: discord.Interaction, error: Exception):
+        await interaction.response.send_message(
+            embed=discord.Embed(
+                title="❌ Error",
+                description=f"Failed to send embed: {error}",
+                color=config.COLOR_ERROR
+            ).set_footer(text=config.FOOTER_TEXT),
+            ephemeral=True
+        )
 
 
 async def setup(bot):
