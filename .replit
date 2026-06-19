@@ -1,13 +1,13 @@
 hidden = [".config"]
 run = "npm run start"
-modules = ["nodejs-20", "python-3.11", "web", "nix"]
+modules = ["python-3.11"]
 
 [[hints]]
 regex = "Error \\[ERR_REQUIRE_ESM\\]"
 message = "We see that you are using require(...) inside your code. We currently do not support this syntax. Please use 'import' instead when using external modules. (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import)"
 
 [nix]
-channel = "stable-25_05"
+channel = "stable-22_05"
 
 [env]
 XDG_CONFIG_HOME = "/home/runner/.config"
@@ -101,4 +101,3 @@ outputType = "console"
 
 [agent]
 expertMode = true
-stack = "BEST_EFFORT_FALLBACK"
