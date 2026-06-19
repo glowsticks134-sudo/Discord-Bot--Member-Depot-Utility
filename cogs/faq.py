@@ -76,7 +76,7 @@ FAQ_ITEMS = [
         "emoji": "❓",
         "answer_title": "Why have I been blacklisted?",
         "answer": (
-            "> Please create a ticket via <#1508856970755706950> and ask staff to check the reason why you have been blacklisted."
+            f"> Please create a ticket via <#{config.CHANNEL_TICKETS}> and ask staff to check the reason why you have been blacklisted."
         )
     },
     {
@@ -85,7 +85,7 @@ FAQ_ITEMS = [
         "emoji": "❓",
         "answer_title": "Why has my server been blacklisted?",
         "answer": (
-            "> Please create a ticket via <#1508856970755706950> and ask staff to check the reason why your Server ID has been blacklisted."
+            f"> Please create a ticket via <#{config.CHANNEL_TICKETS}> and ask staff to check the reason why your Server ID has been blacklisted."
         )
     },
     {
@@ -95,7 +95,7 @@ FAQ_ITEMS = [
         "answer_title": "The stock has run out. Please wait for restock",
         "answer": (
             "> This means that the stock has run out. If you'd like to check the stock, "
-            "please head over to <#1508856975142944768>."
+            f"please head over to <#{config.CHANNEL_STOCK}>."
         )
     },
 ]
