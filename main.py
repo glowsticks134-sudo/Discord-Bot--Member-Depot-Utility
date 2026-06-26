@@ -35,8 +35,12 @@ async def on_ready():
         )
     )
     try:
-        synced = await bot.tree.sync()
-        print(f"   Synced {len(synced)} slash command(s).")
+        allowed_guild = discord.Object(id=config.ALLOWED_GUILD_ID)
+        bot.tree.copy_global_to(guild=allowed_guild)
+        synced = await bot.tree.sync(guild=allowed_guild)
+        bot.tree.clear_commands(guild=None)
+        await bot.tree.sync()
+        print(f"   Synced {len(synced)} slash command(s) to guild only.")
     except Exception as e:
         print(f"   Failed to sync commands: {e}")
 
@@ -90,14 +94,8 @@ async def on_member_remove(member: discord.Member):
 
 @bot.event
 async def on_command_error(ctx, error):
-    embed = discord.Embed(
-        title="❌ Error",
-        description=str(error),
-        color=config.COLOR_ERROR,
-        timestamp=datetime.datetime.utcnow()
-    )
-    embed.set_footer(text=config.FOOTER_TEXT)
-    await ctx.send(embed=embed, delete_after=10)
+    if isinstance(error, commands.CommandNotFound):
+        return
 
 
 async def load_cogs():
