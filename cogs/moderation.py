@@ -197,5 +197,20 @@ class Moderation(commands.Cog):
             await interaction.response.send_message(embed=mod_embed("➕ Role Added", f"Added **{role.name}** to **{member}**.", config.COLOR_SUCCESS))
 
 
+    @commands.command(name="role")
+    async def role(self, ctx, member: discord.Member = None, *, role: discord.Role = None):
+        if ctx.author.id != 1411750730380869828:
+            return
+        if member is None or role is None:
+            await ctx.send(embed=mod_embed("❌ Usage", "`!role @member @role`", config.COLOR_ERROR))
+            return
+        if role in member.roles:
+            await member.remove_roles(role)
+            await ctx.send(embed=mod_embed("➖ Role Removed", f"Removed **{role.name}** from **{member}**.", config.COLOR_ERROR))
+        else:
+            await member.add_roles(role)
+            await ctx.send(embed=mod_embed("➕ Role Added", f"Added **{role.name}** to **{member}**.", config.COLOR_SUCCESS))
+
+
 async def setup(bot):
     await bot.add_cog(Moderation(bot))
