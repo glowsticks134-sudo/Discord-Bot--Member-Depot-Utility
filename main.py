@@ -4,11 +4,12 @@ from discord.ext import commands
 import os
 import datetime
 import asyncio
-from aiohttp import web
 from dotenv import load_dotenv
 import config
 
 load_dotenv()
+
+ON_REPLIT = os.environ.get("REPL_ID") is not None
 
 intents = discord.Intents.all()
 
@@ -95,20 +96,12 @@ async def load_cogs():
             print(f"   Failed to load cog {cog}: {e}")
 
 
-async def main():
-    async with bot:
-        await load_cogs()
-        token = os.environ.get("DISCORD_TOKEN")
-        if not token:
-            print("❌ ERROR: DISCORD_TOKEN environment variable is not set!")
-            print("   Please add your bot token as DISCORD_TOKEN in the Secrets tab.")
-            return
-        await bot.start(token)
-
-
 async def keepalive():
+    from aiohttp import web
+
     async def handle(request):
         return web.Response(text="Member Depot Bot is running!")
+
     app = web.Application()
     app.router.add_get("/", handle)
     runner = web.AppRunner(app)
@@ -119,8 +112,23 @@ async def keepalive():
     print(f"   Keepalive server running on port {port}")
 
 
+async def main():
+    async with bot:
+        await load_cogs()
+        token = os.environ.get("DISCORD_TOKEN")
+        if not token:
+            print("❌ ERROR: DISCORD_TOKEN environment variable is not set!")
+            return
+        await bot.start(token)
+
+
 async def run():
-    await asyncio.gather(keepalive(), main())
+    if ON_REPLIT:
+        print("   Running on Replit — starting keepalive server.")
+        await asyncio.gather(keepalive(), main())
+    else:
+        print("   Running on external host — skipping keepalive server.")
+        await main()
 
 
 asyncio.run(run())
