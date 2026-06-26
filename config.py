@@ -1,4 +1,6 @@
 
+ALLOWED_GUILD_ID = 1517627809680330853
+
 BOT_NAME = "Member Depot Bot"
 SERVER_NAME = "Member Depot"
 OWNER = "Stichachu13"

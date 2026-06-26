@@ -22,6 +22,12 @@ async def on_ready():
     print(f"   Bot: {config.BOT_NAME}")
     print(f"   Server: {config.SERVER_NAME}")
     print(f"   Made by: {config.OWNER}")
+
+    for guild in bot.guilds:
+        if guild.id != config.ALLOWED_GUILD_ID:
+            print(f"   ⚠️ Leaving unauthorised server: {guild.name} ({guild.id})")
+            await guild.leave()
+
     await bot.change_presence(
         activity=discord.Activity(
             type=discord.ActivityType.watching,
@@ -33,6 +39,13 @@ async def on_ready():
         print(f"   Synced {len(synced)} slash command(s).")
     except Exception as e:
         print(f"   Failed to sync commands: {e}")
+
+
+@bot.event
+async def on_guild_join(guild: discord.Guild):
+    if guild.id != config.ALLOWED_GUILD_ID:
+        print(f"   ⚠️ Joined unauthorised server — leaving: {guild.name} ({guild.id})")
+        await guild.leave()
 
 
 @bot.event
