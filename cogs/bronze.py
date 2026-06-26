@@ -61,7 +61,7 @@ class Bronze(commands.Cog):
         ), ephemeral=True)
 
     @app_commands.command(name="freebronze", description="Send the Free Bronze promotion embed")
-    @app_commands.default_permissions(manage_messages=True)
+    @app_commands.default_permissions(administrator=True)
     async def freebronze(self, interaction: discord.Interaction):
         d = get_guild_data(interaction.guild.id)
         server_link = d.get("server_link")

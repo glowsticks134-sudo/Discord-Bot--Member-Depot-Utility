@@ -23,12 +23,14 @@ class Utility(commands.Cog):
         self.bot = bot
 
     @app_commands.command(name="ping", description="Check the bot's latency")
+    @app_commands.default_permissions(administrator=True)
     async def ping(self, interaction: discord.Interaction):
         latency = round(self.bot.latency * 1000)
         embed = util_embed("🏓 Pong!", f"Bot latency: **{latency}ms**", config.COLOR_SUCCESS if latency < 150 else config.COLOR_WARNING)
         await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="serverinfo", description="Get information about this server")
+    @app_commands.default_permissions(administrator=True)
     async def serverinfo(self, interaction: discord.Interaction):
         guild = interaction.guild
         embed = discord.Embed(
@@ -49,6 +51,7 @@ class Utility(commands.Cog):
 
     @app_commands.command(name="userinfo", description="Get information about a user")
     @app_commands.describe(member="The member to look up (defaults to you)")
+    @app_commands.default_permissions(administrator=True)
     async def userinfo(self, interaction: discord.Interaction, member: discord.Member = None):
         member = member or interaction.user
         roles = [r.mention for r in member.roles if r != interaction.guild.default_role]
@@ -70,6 +73,7 @@ class Utility(commands.Cog):
 
     @app_commands.command(name="avatar", description="Get a user's avatar")
     @app_commands.describe(member="The member whose avatar to show (defaults to you)")
+    @app_commands.default_permissions(administrator=True)
     async def avatar(self, interaction: discord.Interaction, member: discord.Member = None):
         member = member or interaction.user
         embed = util_embed(f"🖼️ {member.display_name}'s Avatar")
@@ -78,6 +82,7 @@ class Utility(commands.Cog):
         await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="botinfo", description="Get information about the bot")
+    @app_commands.default_permissions(administrator=True)
     async def botinfo(self, interaction: discord.Interaction):
         embed = discord.Embed(
             title=f"🤖 {config.BOT_NAME}",
@@ -96,6 +101,7 @@ class Utility(commands.Cog):
         await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="help", description="Show all available commands")
+    @app_commands.default_permissions(administrator=True)
     async def help(self, interaction: discord.Interaction):
         embed = discord.Embed(
             title=f"📋 {config.BOT_NAME} — Command List",
@@ -141,7 +147,7 @@ class Utility(commands.Cog):
 
     @app_commands.command(name="say", description="Make the bot send a message in a channel")
     @app_commands.describe(message="The message to send", channel="Channel to send it to (defaults to current channel)")
-    @app_commands.default_permissions(manage_messages=True)
+    @app_commands.default_permissions(administrator=True)
     async def say(self, interaction: discord.Interaction, message: str, channel: discord.TextChannel = None):
         target = channel or interaction.channel
         await target.send(message)

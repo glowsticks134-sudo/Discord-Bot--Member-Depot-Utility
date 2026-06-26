@@ -146,7 +146,7 @@ class FAQ(commands.Cog):
         self.bot = bot
 
     @app_commands.command(name="faq", description="Send the FAQ embed with dropdown")
-    @app_commands.default_permissions(manage_messages=True)
+    @app_commands.default_permissions(administrator=True)
     async def faq(self, interaction: discord.Interaction):
         embed = discord.Embed(
             title="🔎 Frequently Asked Questions",

@@ -117,7 +117,7 @@ class Info(commands.Cog):
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
     @app_commands.command(name="sendhowto", description="Send the 'How To Use Member Depot' embed")
-    @app_commands.default_permissions(manage_messages=True)
+    @app_commands.default_permissions(administrator=True)
     async def sendhowto(self, interaction: discord.Interaction):
         embed = discord.Embed(
             title="How To Use Member Depot",
@@ -135,7 +135,7 @@ class Info(commands.Cog):
         await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="sendtos", description="Send the Member Depot TOS embed")
-    @app_commands.default_permissions(manage_messages=True)
+    @app_commands.default_permissions(administrator=True)
     async def sendtos(self, interaction: discord.Interaction):
         embed = discord.Embed(
             title="Member Depot TOS",
@@ -155,7 +155,7 @@ class Info(commands.Cog):
         await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="sendrules", description="Send the Member Depot Rules embed")
-    @app_commands.default_permissions(manage_messages=True)
+    @app_commands.default_permissions(administrator=True)
     async def sendrules(self, interaction: discord.Interaction):
         embed = discord.Embed(
             title="Member Depot Rules",
@@ -183,7 +183,7 @@ class Info(commands.Cog):
         await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="sendplans", description="Send the Member Depot Plans embed")
-    @app_commands.default_permissions(manage_messages=True)
+    @app_commands.default_permissions(administrator=True)
     async def sendplans(self, interaction: discord.Interaction):
         d = get_guild_data(interaction.guild.id)
         upgrade_url = d.get("upgrade_now_url")
