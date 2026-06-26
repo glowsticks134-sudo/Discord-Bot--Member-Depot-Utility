@@ -157,6 +157,34 @@ class Utility(commands.Cog):
         target = channel or interaction.channel
         await interaction.response.send_modal(EmbedBuilderModal(target))
 
+    @app_commands.command(name="editembed", description="Edit an existing embed sent by the bot (Admin only)")
+    @app_commands.describe(
+        message_id="The ID of the message containing the embed",
+        channel="The channel the message is in (defaults to current channel)"
+    )
+    @app_commands.default_permissions(administrator=True)
+    async def editembed_cmd(self, interaction: discord.Interaction, message_id: str, channel: discord.TextChannel = None):
+        target = channel or interaction.channel
+        try:
+            message = await target.fetch_message(int(message_id))
+        except discord.NotFound:
+            await interaction.response.send_message(embed=util_embed("❌ Message not found", "Could not find that message in this channel.", config.COLOR_ERROR), ephemeral=True)
+            return
+        except ValueError:
+            await interaction.response.send_message(embed=util_embed("❌ Invalid ID", "Please provide a valid message ID (numbers only).", config.COLOR_ERROR), ephemeral=True)
+            return
+
+        if message.author.id != self.bot.user.id:
+            await interaction.response.send_message(embed=util_embed("❌ Not my message", "I can only edit embeds that I sent.", config.COLOR_ERROR), ephemeral=True)
+            return
+
+        if not message.embeds:
+            await interaction.response.send_message(embed=util_embed("❌ No embed", "That message doesn't contain an embed.", config.COLOR_ERROR), ephemeral=True)
+            return
+
+        existing = message.embeds[0]
+        await interaction.response.send_modal(EmbedEditorModal(message, existing))
+
 
 class EmbedBuilderModal(discord.ui.Modal, title="Embed Builder"):
     embed_title = discord.ui.TextInput(
@@ -228,6 +256,92 @@ class EmbedBuilderModal(discord.ui.Modal, title="Embed Builder"):
             embed=discord.Embed(
                 title="❌ Error",
                 description=f"Failed to send embed: {error}",
+                color=config.COLOR_ERROR
+            ).set_footer(text=config.FOOTER_TEXT),
+            ephemeral=True
+        )
+
+
+class EmbedEditorModal(discord.ui.Modal, title="Edit Embed"):
+    def __init__(self, message: discord.Message, existing: discord.Embed):
+        super().__init__()
+        self.target_message = message
+
+        color_hex = f"{existing.color.value:06X}" if existing.color and existing.color.value else ""
+        image_url = existing.image.url if existing.image else ""
+        thumbnail_url = existing.thumbnail.url if existing.thumbnail else ""
+
+        self.embed_title = discord.ui.TextInput(
+            label="Title",
+            default=existing.title or "",
+            max_length=256,
+            required=True,
+        )
+        self.embed_description = discord.ui.TextInput(
+            label="Description",
+            default=existing.description or "",
+            style=discord.TextStyle.paragraph,
+            max_length=4000,
+            required=True,
+        )
+        self.embed_color = discord.ui.TextInput(
+            label="Color (hex, e.g. 5865F2)",
+            default=color_hex,
+            max_length=7,
+            required=False,
+        )
+        self.embed_image = discord.ui.TextInput(
+            label="Image URL (optional)",
+            default=image_url,
+            required=False,
+        )
+        self.embed_thumbnail = discord.ui.TextInput(
+            label="Thumbnail URL (optional)",
+            default=thumbnail_url,
+            required=False,
+        )
+
+        self.add_item(self.embed_title)
+        self.add_item(self.embed_description)
+        self.add_item(self.embed_color)
+        self.add_item(self.embed_image)
+        self.add_item(self.embed_thumbnail)
+
+    async def on_submit(self, interaction: discord.Interaction):
+        try:
+            hex_color = int(self.embed_color.value.lstrip("#"), 16) if self.embed_color.value.strip() else config.COLOR_PRIMARY
+        except Exception:
+            hex_color = config.COLOR_PRIMARY
+
+        embed = discord.Embed(
+            title=self.embed_title.value,
+            description=self.embed_description.value,
+            color=hex_color,
+            timestamp=datetime.datetime.utcnow()
+        )
+
+        if self.embed_thumbnail.value.strip():
+            embed.set_thumbnail(url=self.embed_thumbnail.value.strip())
+
+        if self.embed_image.value.strip():
+            embed.set_image(url=self.embed_image.value.strip())
+
+        embed.set_footer(text=config.FOOTER_TEXT)
+
+        await self.target_message.edit(embed=embed)
+
+        confirm = discord.Embed(
+            description="✅ Embed updated successfully.",
+            color=config.COLOR_SUCCESS
+        )
+        confirm.set_footer(text=config.FOOTER_TEXT)
+        await interaction.response.send_message(embed=confirm, ephemeral=True)
+
+    async def on_error(self, interaction: discord.Interaction, error: Exception):
+        await interaction.response.send_message(
+            embed=discord.Embed(
+                title="❌ Error",
+                description=f"Failed to edit embed: {error}",
                 color=config.COLOR_ERROR
             ).set_footer(text=config.FOOTER_TEXT),
             ephemeral=True
