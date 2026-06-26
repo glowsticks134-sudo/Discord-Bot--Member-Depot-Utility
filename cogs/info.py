@@ -119,19 +119,14 @@ class Info(commands.Cog):
     @app_commands.command(name="sendhowto", description="Send the 'How To Use Member Depot' embed")
     @app_commands.default_permissions(manage_messages=True)
     async def sendhowto(self, interaction: discord.Interaction):
-        d = get_guild_data(interaction.guild.id)
-        add_bot = f"<#{d['add_bot']}>" if d.get("add_bot") else "**#add-bot**"
-        farm_here = f"<#{d['farm_here']}>" if d.get("farm_here") else "**#farm-here**"
-        plans = f"<#{d['plans']}>" if d.get("plans") else "**#plans**"
-
         embed = discord.Embed(
             title="How To Use Member Depot",
             description=(
-                f"• Navigate over to {add_bot} and add the bot to your server.\n"
-                f"• Then, navigate over to {farm_here} and run the **Command** below.\n\n"
+                f"• Navigate over to <#{config.CHANNEL_ADD_BOT}> and add the bot to your server.\n"
+                f"• Then, navigate over to <#{config.CHANNEL_FARM_HERE}> and run the **Command** below.\n\n"
                 f"**Command**\n"
                 f"• !djoin (Server ID)\n"
-                f"• **Want More Members?** {plans}!"
+                f"• **Want More Members?** <#{config.CHANNEL_PLANS}>!"
             ),
             color=config.COLOR_PRIMARY,
             timestamp=datetime.datetime.utcnow()
