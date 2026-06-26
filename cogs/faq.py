@@ -112,6 +112,7 @@ class FAQSelect(discord.ui.Select):
             for item in FAQ_ITEMS
         ]
         super().__init__(
+            custom_id="faq_persistent_select",
             placeholder="Choose what you need help with here...",
             min_values=1,
             max_values=1,
@@ -144,8 +145,9 @@ class FAQView(discord.ui.View):
 class FAQ(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        bot.add_view(FAQView())
 
-    @app_commands.command(name="faq", description="Send the FAQ embed with dropdown")
+    @app_commands.command(name="faq", description="Post the FAQ embed with interactive dropdown")
     @app_commands.default_permissions(administrator=True)
     async def faq(self, interaction: discord.Interaction):
         embed = discord.Embed(
