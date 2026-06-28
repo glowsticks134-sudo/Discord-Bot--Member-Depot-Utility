@@ -122,7 +122,7 @@ class Utility(commands.Cog):
         )
         embed.add_field(
             name="🔧 Utility",
-            value="`/ping` `/serverinfo` `/userinfo` `/avatar` `/botinfo` `/help` `/embed` `/ghostping`",
+            value="`/ping` `/serverinfo` `/userinfo` `/avatar` `/botinfo` `/help` `/embed`",
             inline=False
         )
         embed.add_field(
@@ -145,17 +145,16 @@ class Utility(commands.Cog):
         embed.set_footer(text=config.FOOTER_TEXT)
         await interaction.response.send_message(embed=embed)
 
-    @app_commands.command(name="ghostping", description="Ghost ping @everyone in a channel (Admin only)")
-    @app_commands.describe(channel="Channel to ghost ping (defaults to current channel)")
-    @app_commands.default_permissions(administrator=True)
-    async def ghostping(self, interaction: discord.Interaction, channel: discord.TextChannel = None):
-        target = channel or interaction.channel
+    @commands.command(name="ghostping")
+    @commands.has_permissions(administrator=True)
+    async def ghostping(self, ctx, channel: discord.TextChannel = None):
+        target = channel or ctx.channel
+        try:
+            await ctx.message.delete()
+        except Exception:
+            pass
         msg = await target.send("@everyone")
         await msg.delete()
-        await interaction.response.send_message(
-            embed=util_embed("👻 Ghost ping sent!", f"@everyone was ghost pinged in {target.mention}.", config.COLOR_SUCCESS),
-            ephemeral=True
-        )
 
     @app_commands.command(name="say", description="Make the bot send a message in a channel")
     @app_commands.describe(message="The message to send", channel="Channel to send it to (defaults to current channel)")
