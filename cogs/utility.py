@@ -147,13 +147,14 @@ class Utility(commands.Cog):
 
     @commands.command(name="ghostping")
     @commands.has_permissions(administrator=True)
-    async def ghostping(self, ctx, channel: discord.TextChannel = None):
+    async def ghostping(self, ctx, target_role: discord.Role = None, channel: discord.TextChannel = None):
         target = channel or ctx.channel
+        mention = target_role.mention if target_role else "@everyone"
         try:
             await ctx.message.delete()
         except Exception:
             pass
-        msg = await target.send("@everyone")
+        msg = await target.send(mention)
         await msg.delete()
 
     @app_commands.command(name="say", description="Make the bot send a message in a channel")
