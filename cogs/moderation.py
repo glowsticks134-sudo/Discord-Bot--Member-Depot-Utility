@@ -6,6 +6,34 @@ import datetime
 import config
 
 
+class ShowMessageView(discord.ui.View):
+    def __init__(self, allowed_user_ids: set, original_content: str, original_author: discord.Member):
+        super().__init__(timeout=None)
+        self.allowed_user_ids = allowed_user_ids
+        self.original_content = original_content
+        self.original_author = original_author
+
+    @discord.ui.button(label="Show", style=discord.ButtonStyle.secondary, emoji="👁️")
+    async def show_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id not in self.allowed_user_ids:
+            await interaction.response.send_message(
+                "This button is only for the person who was pinged.", ephemeral=True
+            )
+            return
+        embed = discord.Embed(
+            title="🔍 Deleted Message",
+            description=self.original_content or "*No text content*",
+            color=0x2B2D31,
+            timestamp=datetime.datetime.utcnow(),
+        )
+        embed.set_author(
+            name=str(self.original_author),
+            icon_url=self.original_author.display_avatar.url,
+        )
+        embed.set_footer(text="Only visible to you")
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+
+
 def mod_embed(title, description, color=None):
     embed = discord.Embed(
         title=title,
@@ -222,15 +250,23 @@ class Moderation(commands.Cog):
         hit = mentioned_ids & self.PROTECTED_USERS
         if not hit:
             return
+        original_content = message.content
+        original_author = message.author
         try:
             await message.delete()
         except Exception:
             pass
         pinged = discord.utils.get(message.guild.members, id=next(iter(hit)))
         name = pinged.mention if pinged else "that user"
+        view = ShowMessageView(
+            allowed_user_ids=hit,
+            original_content=original_content,
+            original_author=original_author,
+        )
         await message.channel.send(
             f"Please don't ping {name}. If you need help please visit "
             f"<#1517627811257651358> and <#1517627811500785681>",
+            view=view,
         )
 
 
