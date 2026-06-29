@@ -230,7 +230,8 @@ class Moderation(commands.Cog):
         name = pinged.mention if pinged else "that user"
         await message.channel.send(
             f"Please don't ping {name}. If you need help please visit "
-            f"<#1517627811257651358> and <#1517627811500785681>"
+            f"<#1517627811257651358> and <#1517627811500785681>",
+            delete_after=30
         )
 
 
