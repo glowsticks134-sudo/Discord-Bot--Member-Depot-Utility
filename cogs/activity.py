@@ -463,40 +463,6 @@ class Activity(commands.Cog):
         embed.set_footer(text=config.FOOTER_TEXT)
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
-    @app_commands.command(name="leaderboard", description="View today's most active members")
-    async def leaderboard(self, interaction: discord.Interaction):
-        data = load_data()
-        settings = get_guild_settings(data, interaction.guild.id)
-        today = get_today(settings.get("timezone", "UTC"))
-        req = settings.get("requirement", 35)
-        gid = str(interaction.guild.id)
-        guild_activity = data.get("activity", {}).get(gid, {})
-
-        entries = [
-            (int(uid), udata.get("count", 0), udata.get("completed_today", False))
-            for uid, udata in guild_activity.items()
-            if udata.get("date") == today
-        ]
-        entries.sort(key=lambda x: x[1], reverse=True)
-        top = entries[:10]
-
-        medals = ["🥇", "🥈", "🥉"] + ["🏅"] * 7
-        lines = []
-        for i, (uid, count, completed) in enumerate(top):
-            member = interaction.guild.get_member(uid)
-            name = member.display_name if member else f"User {uid}"
-            lock = "✅" if completed else "❌"
-            lines.append(f"{medals[i]} **{name}** {lock}\n`{progress_bar(count, req, 12)}` {count}/{req}")
-
-        embed = discord.Embed(
-            title="🏆 Daily Activity Leaderboard",
-            description="\n\n".join(lines) if lines else "No activity recorded today yet.",
-            color=config.COLOR_PRIMARY,
-            timestamp=datetime.datetime.utcnow(),
-        )
-        embed.set_footer(text=config.FOOTER_TEXT)
-        await interaction.response.send_message(embed=embed)
-
 
 async def setup(bot):
     await bot.add_cog(Activity(bot))
