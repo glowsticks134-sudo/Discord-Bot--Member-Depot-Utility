@@ -1,0 +1,266 @@
+# Replit Prompt – Daily Activity Gate System for Discord Bot
+
+I want you to build a brand-new feature for my Discord bot called **Daily Activity Access**. This feature should be production-ready, efficient, and easy to configure.
+
+## Goal
+
+Members must send **35 messages every day** to unlock access to our farming/service channels.
+
+Once they reach 35 valid messages:
+
+* They automatically receive a configurable role (example: `Daily Active`).
+* That role grants access to specific channels (such as the Farm Channel and Bot Service channels).
+* They receive a congratulatory DM and a message in the server letting them know they've unlocked access for the rest of the day.
+
+At the end of each day:
+
+* Every user's daily message count resets to 0.
+* The access role is automatically removed from everyone.
+* Members must earn it again the next day.
+
+---
+
+# Requirements
+
+## Message Tracking
+
+Track messages per user.
+
+Only count messages that:
+
+* Are sent by real users (ignore bots).
+* Are at least 5 characters long.
+* Are not commands.
+* Are not repeated spam.
+* Ignore rapid spam (example: multiple messages within 2 seconds).
+* Ignore duplicate messages.
+
+Store:
+
+* User ID
+* Guild ID
+* Daily Message Count
+* Last Message
+* Last Message Time
+* Date
+
+---
+
+## Daily Requirement
+
+Requirement:
+35 valid messages
+
+When a user reaches 35:
+
+Automatically:
+
+* Give configured role
+* Unlock farming channels through Discord permissions
+* Send DM:
+
+🎉 Congratulations!
+You completed today's activity requirement.
+You now have access to today's farming channels.
+
+Also send a server notification:
+
+✅ @User has unlocked today's farming access!
+
+---
+
+## Daily Reset
+
+Automatically reset every day at **12:00 AM** using the server's configured timezone.
+
+Reset:
+
+* Daily message counts
+* Remove Daily Active role from every member
+* Lock access again
+
+No manual commands should be required.
+
+---
+
+# Admin Configuration
+
+Create slash commands:
+
+/activity setup
+
+* Select Activity Role
+* Select Required Messages
+* Select Timezone
+* Select Announcement Channel
+
+/activity role
+
+/activity requirement
+
+/activity timezone
+
+/activity reset
+
+/activity stats
+
+---
+
+# User Commands
+
+/activity
+
+Shows:
+
+Today's Progress
+
+██████████░░░░░░░░
+
+Messages:
+18 / 35
+
+Status:
+❌ Locked
+
+or
+
+✅ Unlocked
+
+---
+
+/leaderboard
+
+Shows today's most active users.
+
+---
+
+## Dashboard
+
+If the bot has a web dashboard:
+
+Display:
+
+Today's Active Members
+
+Members Who Unlocked
+
+Messages Today
+
+Completion %
+
+Top Active Users
+
+Manual Reset Button
+
+---
+
+# Database
+
+Store:
+
+Guild Settings
+
+User Activity
+
+Last Reset Date
+
+Timezone
+
+Role IDs
+
+Announcement Channel
+
+Everything should persist after bot restarts.
+
+---
+
+# Anti-Spam
+
+Do NOT count:
+
+Spam
+
+Bots
+
+Commands
+
+Repeated messages
+
+Messages under 5 characters
+
+Messages sent too quickly
+
+Webhook messages
+
+Optional:
+Detect copy/paste spam.
+
+---
+
+# Performance
+
+The bot should support servers with 100,000+ members efficiently.
+
+Use:
+
+* Optimized database queries
+* Scheduled jobs for resets
+* Proper caching
+* Async operations
+* Error handling
+* Logging
+
+---
+
+# Nice UI
+
+Use professional Discord embeds.
+
+Use:
+🟢 Green for unlocked
+
+🔴 Red for locked
+
+🟡 Yellow for progress
+
+Include progress bars.
+
+---
+
+# Bonus Features
+
+Add:
+
+• Daily streaks (how many consecutive days completed)
+
+• Weekly statistics
+
+• Monthly statistics
+
+• Activity history
+
+• Activity logs
+
+• Configurable message requirement
+
+• Optional voice activity requirement
+
+• Ignore selected channels
+
+• Ignore selected roles
+
+• Whitelist channels
+
+• Blacklist channels
+
+• Cooldown configuration
+
+• Activity analytics
+
+• Export activity data
+
+• Automatic role synchronization after bot restart
+
+---
+
+The code should be modular, clean, scalable, well-commented, and follow best practices. Separate the feature into commands, events, services, database models, scheduled tasks, and utility files so it is easy to maintain and expand in the future.
