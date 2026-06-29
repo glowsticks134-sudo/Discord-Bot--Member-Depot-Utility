@@ -1,0 +1,103 @@
+# Replit Prompt – Simple Temporary Roles Feature
+
+I want you to add a simple **Temporary Roles** feature to my Discord bot.
+
+## Commands
+
+### `/temprole add`
+
+Options:
+
+* User
+* Role
+* Duration
+
+Example:
+
+```text
+/temprole add
+User: @User
+Role: VIP
+Duration: 7d
+```
+
+When this command is used:
+
+* Give the selected role to the user immediately.
+* Store the expiration time in the database.
+* Automatically remove the role when the duration expires.
+* The timer must continue working even if the bot restarts.
+
+Supported duration formats:
+
+* 30m
+* 1h
+* 12h
+* 1d
+* 3d
+* 7d
+* 14d
+* 30d
+* 90d
+* 365d
+
+Also support combined durations like:
+
+* 1d12h
+* 2h30m
+
+---
+
+### `/temprole remove`
+
+Options:
+
+* User
+* Role
+
+This command should:
+
+* Immediately remove the selected temporary role from the user.
+* Delete its timer from the database so it won't be removed again later.
+
+---
+
+## DM Notifications
+
+When a temporary role is added, send the user a DM like:
+
+> 🎉 You have been given the **{Role Name}** role in **{Server Name}**.
+>
+> This role will expire in **{Duration}**.
+
+When a temporary role expires, automatically DM the user:
+
+> ⏰ Your **{Role Name}** role in **{Server Name}** has expired and has been removed automatically.
+
+If the user has DMs disabled, the bot should silently ignore the error and continue running without interruption.
+
+---
+
+## Requirements
+
+* Only members with **Manage Roles** or **Administrator** permissions can use these commands.
+* The bot must check that its role is above the role being assigned.
+* Prevent assigning managed or integration roles.
+* Prevent duplicate temporary roles for the same user.
+* Store all temporary roles in the database so they survive bot restarts.
+* Run a background task every minute to check for expired temporary roles and remove them automatically.
+* Use clean, professional embeds for success and error messages.
+* Organize the code into separate files (commands, scheduler, database, utilities) to keep it clean and easy to maintain.
+
+---
+
+## Performance
+
+The system should be optimized for large Discord servers.
+
+* Use efficient database queries and indexing.
+* Only check users with active temporary roles instead of scanning every server member.
+* Use asynchronous operations to avoid blocking the bot.
+* Handle errors gracefully so one failed role removal doesn't stop the scheduler.
+* Ensure timers continue correctly after bot restarts or updates.
+* Write clean, modular, and scalable code following best practices.
