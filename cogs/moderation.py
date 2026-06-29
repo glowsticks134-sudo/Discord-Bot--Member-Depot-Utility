@@ -212,5 +212,27 @@ class Moderation(commands.Cog):
             await ctx.send(embed=mod_embed("➕ Role Added", f"Added **{role.name}** to **{member}**.", config.COLOR_SUCCESS))
 
 
+    PROTECTED_USERS = {1411750730380869828, 1404401068007493659, 1376202163994361956}
+
+    @commands.Cog.listener()
+    async def on_message(self, message: discord.Message):
+        if not message.guild or message.author.bot:
+            return
+        mentioned_ids = {u.id for u in message.mentions}
+        hit = mentioned_ids & self.PROTECTED_USERS
+        if not hit:
+            return
+        try:
+            await message.delete()
+        except Exception:
+            pass
+        pinged = discord.utils.get(message.guild.members, id=next(iter(hit)))
+        name = pinged.mention if pinged else "that user"
+        await message.channel.send(
+            f"Please don't ping {name}. If you need help please visit "
+            f"<#1517627811257651358> and <#1517627811500785681>"
+        )
+
+
 async def setup(bot):
     await bot.add_cog(Moderation(bot))
