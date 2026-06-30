@@ -8,7 +8,7 @@ import config
 
 DATA_FILE = "data/sticky.json"
 RESTOCK_CHANNEL_ID = config.CHANNEL_RESTOCK
-RESTOCK_HOUR_UTC = 17
+RESTOCK_HOUR_UTC = 16
 RESTOCK_MINUTE_UTC = 0
 
 
@@ -53,36 +53,10 @@ def format_countdown(seconds: int) -> str:
         return f"**{secs}s**"
 
 
-def next_restock_timestamp() -> int:
-    now = datetime.datetime.now(datetime.timezone.utc)
-    restock_today = now.replace(
-        hour=RESTOCK_HOUR_UTC, minute=RESTOCK_MINUTE_UTC, second=0, microsecond=0
-    )
-    if now >= restock_today:
-        restock_today += datetime.timedelta(days=1)
-    return int(restock_today.timestamp())
 
-
-def build_embed() -> discord.Embed:
+def build_message() -> str:
     secs = seconds_until_restock()
-    ts = next_restock_timestamp()
-    embed = discord.Embed(
-        title="🔄 Next Restock",
-        color=config.COLOR_PRIMARY,
-    )
-    embed.add_field(
-        name="⏳ Time Remaining",
-        value=format_countdown(secs),
-        inline=False,
-    )
-    embed.add_field(
-        name="🕔 Restock At",
-        value=f"<t:{ts}:T> • <t:{ts}:R>",
-        inline=False,
-    )
-    embed.set_footer(text=f"{config.FOOTER_TEXT} • Updates every minute")
-    embed.timestamp = datetime.datetime.now(datetime.timezone.utc)
-    return embed
+    return f"🔄 Next restock in {format_countdown(secs)}"
 
 
 # ── Cog ───────────────────────────────────────────────────────────────────────
@@ -116,7 +90,7 @@ class Sticky(commands.Cog):
             return None
 
     async def _post_sticky(self, channel: discord.TextChannel) -> discord.Message:
-        msg = await channel.send(embed=build_embed())
+        msg = await channel.send(build_message())
         self._sticky_msg_id = msg.id
         save_data({"sticky_msg_id": msg.id})
         return msg
@@ -133,7 +107,7 @@ class Sticky(commands.Cog):
                 await self._post_sticky(channel)
             else:
                 try:
-                    await existing.edit(embed=build_embed())
+                    await existing.edit(content=build_message())
                 except Exception:
                     await self._post_sticky(channel)
 
