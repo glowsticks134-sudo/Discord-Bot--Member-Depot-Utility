@@ -32,31 +32,19 @@ def save_data(data):
 
 # ── Countdown Helper ──────────────────────────────────────────────────────────
 
-def seconds_until_restock() -> int:
+def next_restock_timestamp() -> int:
     now = datetime.datetime.now(datetime.timezone.utc)
     restock_today = now.replace(
         hour=RESTOCK_HOUR_UTC, minute=RESTOCK_MINUTE_UTC, second=0, microsecond=0
     )
     if now >= restock_today:
         restock_today += datetime.timedelta(days=1)
-    return int((restock_today - now).total_seconds())
-
-
-def format_countdown(seconds: int) -> str:
-    hours, remainder = divmod(seconds, 3600)
-    minutes, secs = divmod(remainder, 60)
-    if hours > 0:
-        return f"**{hours}h {minutes}m {secs}s**"
-    elif minutes > 0:
-        return f"**{minutes}m {secs}s**"
-    else:
-        return f"**{secs}s**"
-
+    return int(restock_today.timestamp())
 
 
 def build_message() -> str:
-    secs = seconds_until_restock()
-    return f"🔄 Next restock in {format_countdown(secs)}"
+    ts = next_restock_timestamp()
+    return f"🔄 Next restock <t:{ts}:R>"
 
 
 # ── Cog ───────────────────────────────────────────────────────────────────────
@@ -113,7 +101,7 @@ class Sticky(commands.Cog):
 
     # ── Background Task ───────────────────────────────────────────────────────
 
-    @tasks.loop(minutes=1)
+    @tasks.loop(hours=1)
     async def update_sticky(self):
         channel = await self._get_channel()
         if channel:
